@@ -520,8 +520,8 @@ float AirConditioner::CalculateTemp(uint8_t byte) { return (byte - 0x28) / 2.0; 
 ClimateTraits AirConditioner::traits() {
   auto traits = ClimateTraits();
   traits.set_supports_current_temperature(true);
-  traits.set_visual_min_temperature_override(17);
-  traits.set_visual_max_temperature_override(30);
+  traits.set_visual_min_temperature_override(float visual_min_temperature_override);
+  traits.set_visual_max_temperature_override(float visual_max_temperature_override);
   traits.set_visual_temperature_step(1.0);
   traits.set_supported_modes(this->supported_modes_);
   traits.set_supported_swing_modes(this->supported_swing_modes_);
