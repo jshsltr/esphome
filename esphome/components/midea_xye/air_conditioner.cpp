@@ -350,7 +350,7 @@ void AirConditioner::ParseResponse(uint8_t cmdSent) {
           // Don't update the fan mode. Assume it set correctly.
           // Show Heating vs Heat at least in Heat mode. Will figure
           // out how to determine if compressor is on in other modes later.
-          update_property(this->current_temperature, CalculateTemp(nextFollowMeTemperature), need_publish);
+          update_property(this->current_temperature, CalculateTemp(lastFollowMeTemperature), need_publish);
           if ((this->mode == climate::CLIMATE_MODE_HEAT) && (RXData[9] & 0x0F) != 0x00) {
             this->action = climate::CLIMATE_ACTION_HEATING;
             need_publish = true;
@@ -574,7 +574,6 @@ void AirConditioner::do_follow_me(float temperature, bool beeper) {
     followMeInit = true;
   }
   lastFollowMeTemperature = static_cast<uint8_t>(lroundf(temperature));
-  float nextFollowMeTemperature = lastFollowMeTemperature;
   TXData[11] = lastFollowMeTemperature;
   TXData[14] = CalculateCRC(TXData, TX_LEN);
   // Only send if mode is something other than off.
