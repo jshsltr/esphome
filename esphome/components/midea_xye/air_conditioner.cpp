@@ -9,9 +9,6 @@ namespace midea {
 namespace ac {
 
 const char *const Constants::TAG = "midea_xye";
-const char *const Constants::FREEZE_PROTECTION = "freeze protection";
-const char *const Constants::SILENT = "silent";
-const char *const Constants::TURBO = "turbo";
 
 static void set_sensor(Sensor *sensor, float value) {
   if (sensor != nullptr && (!sensor->has_state() || sensor->get_raw_state() != value))
@@ -54,18 +51,7 @@ void AirConditioner::control(const ClimateCall &call) {
 
 void AirConditioner::setup() {
   // this->uart_->check_uart_settings(4800, 1, UART_CONFIG_PARITY_NONE, 8);
-  if (!this->supported_modes_.empty()) {
-    this->last_on_mode_ = *this->supported_modes_.begin();
-    // Prefer the first non-off operating mode if available
-    for (auto mode : this->supported_modes_) {
-      if (mode != ClimateMode::CLIMATE_MODE_OFF) {
-        this->last_on_mode_ = mode;
-        break;
-      }
-    }
-  } else {
-    this->last_on_mode_ = ClimateMode::CLIMATE_MODE_HEAT_COOL;
-  }
+  this->last_on_mode_ = *this->supported_modes_.begin();
   controlState = STATE_SEND_C0;
   ForceReadNextCycle = 1;
   followMeInit = false;
@@ -407,6 +393,7 @@ void AirConditioner::ParseResponse(uint8_t cmdSent) {
         if (need_publish)
           this->publish_state();
 
+        set_sensor(this->temperature_1_sensor_, CalculateTemp(RXData[RX_C0_BYTE_T1_TEMP]));
         set_sensor(this->temperature_2a_sensor_, CalculateTemp(RXData[RX_C0_BYTE_T2A_TEMP]));
         set_sensor(this->temperature_2b_sensor_, CalculateTemp(RXData[RX_C0_BYTE_T2B_TEMP]));
         set_sensor(this->temperature_3_sensor_, CalculateTemp(RXData[RX_C0_BYTE_T3_TEMP]));
@@ -532,7 +519,7 @@ float AirConditioner::CalculateTemp(uint8_t byte) { return (byte - 0x28) / 2.0; 
 
 ClimateTraits AirConditioner::traits() {
   auto traits = ClimateTraits();
-  traits.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE | climate::CLIMATE_SUPPORTS_ACTION);
+  traits.set_supports_current_temperature(true);
   traits.set_visual_min_temperature(17);
   traits.set_visual_max_temperature(30);
   traits.set_visual_temperature_step(1.0);
@@ -554,6 +541,8 @@ ClimateTraits AirConditioner::traits() {
     traits.add_supported_swing_mode(ClimateSwingMode::CLIMATE_SWING_OFF);
   if (!traits.get_supported_presets().empty())
     traits.add_supported_preset(ClimatePreset::CLIMATE_PRESET_NONE);
+
+  traits.set_supports_action(true);
 
   return traits;
 }
