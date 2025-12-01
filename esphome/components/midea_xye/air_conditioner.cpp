@@ -573,7 +573,7 @@ void AirConditioner::do_follow_me(float temperature, bool beeper) {
     TXData[10] = 6;
     followMeInit = true;
   }
-  lastFollowMeTemperature = static_cast<uint8_t>(lroundf(temperature));
+  lastFollowMeTemperature = static_cast<float>(lroundf(temperature));
   TXData[11] = lastFollowMeTemperature;
   TXData[14] = CalculateCRC(TXData, TX_LEN);
   // Only send if mode is something other than off.
