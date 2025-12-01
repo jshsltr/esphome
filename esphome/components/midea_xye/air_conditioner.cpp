@@ -517,7 +517,7 @@ uint32_t AirConditioner::CalculateGetTime(uint8_t time) {
 
 float AirConditioner::CalculateTemp(uint8_t byte) { return (byte - 0x28) / 2.0; }
 
-ClimateTraits AirConditioner::traits() {
+Climate AirConditioner::traits() {
   auto traits = ClimateTraits();
   traits.set_supports_current_temperature(true);
   traits.set_visual_min_temperature_override(float visual_min_temperature_override);
