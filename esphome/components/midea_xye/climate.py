@@ -7,13 +7,17 @@ import esphome.codegen as cg
 from esphome.const import (
     CONF_AUTOCONF,
     CONF_BEEPER,
+    CONF_CURRENT,
     CONF_CUSTOM_FAN_MODES,
     CONF_CUSTOM_PRESETS,
+    CONF_HUMIDITY_SENSOR,
     CONF_ID,
     CONF_PERIOD,
     CONF_SUPPORTED_MODES,
     CONF_SUPPORTED_PRESETS,
     CONF_SUPPORTED_SWING_MODES,
+    #CONF_TARGET_TEMPERATURE,
+    CONF_OUTDOOR_TEMPERATURE,
     CONF_TIMEOUT,
     CONF_TEMPERATURE,
     CONF_USE_FAHRENHEIT,
@@ -49,18 +53,15 @@ from esphome.components.climate import (
 # CODEOWNERS = ["@dudanov"]
 DEPENDENCIES = ["climate", "uart", "wifi"]
 AUTO_LOAD = ["number", "sensor"]
-CONF_OUTDOOR_TEMPERATURE = "outdoor_temperature"
 CONF_TEMPERATURE_1 = "temperature_1"
 CONF_TEMPERATURE_2A = "temperature_2a"
 CONF_TEMPERATURE_2B = "temperature_2b"
 CONF_TEMPERATURE_3 = "temperature_3"
-CONF_CURRENT = "current"
 CONF_TIMER_START = "timer_start"
 CONF_TIMER_STOP = "timer_stop"
 CONF_ERROR_FLAGS = "error_flags"
 CONF_PROTECT_FLAGS = "protect_flags"
 CONF_POWER_USAGE = "power_usage"
-CONF_HUMIDITY_SETPOINT = "humidity_setpoint"
 CONF_STATIC_PRESSURE = "static_pressure"
 midea_ac_ns = cg.esphome_ns.namespace("midea").namespace("ac")
 AirConditioner = midea_ac_ns.class_("AirConditioner", climate.Climate, cg.Component)
@@ -243,7 +244,7 @@ CONFIG_SCHEMA = cv.All(
                 device_class=DEVICE_CLASS_POWER,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
-            cv.Optional(CONF_HUMIDITY_SETPOINT): sensor.sensor_schema(
+            cv.Optional(CONF_HUMIDITY_SENSOR): sensor.sensor_schema(
                 unit_of_measurement=UNIT_PERCENT,
                 icon=ICON_WATER_PERCENT,
                 accuracy_decimals=0,
@@ -394,6 +395,9 @@ async def to_code(config):
     if CONF_OUTDOOR_TEMPERATURE in config:
         sens = await sensor.new_sensor(config[CONF_OUTDOOR_TEMPERATURE])
         cg.add(var.set_outdoor_temperature_sensor(sens))
+   # if CONF_TARGET_TEMPERATURE in config:
+   #     sens = await sensor.new_sensor(config[CONF_TARGET_TEMPERATURE])
+   #     cg.add(var.set_target_temperature_sensor(sens)) 
     if CONF_TEMPERATURE_1 in config:
         sens = await sensor.new_sensor(config[CONF_TEMPERATURE_1])
         cg.add(var.set_temperature_1_sensor(sens))
@@ -424,7 +428,7 @@ async def to_code(config):
     if CONF_POWER_USAGE in config:
         sens = await sensor.new_sensor(config[CONF_POWER_USAGE])
         cg.add(var.set_power_sensor(sens))
-    if CONF_HUMIDITY_SETPOINT in config:
-        sens = await sensor.new_sensor(config[CONF_HUMIDITY_SETPOINT])
-        cg.add(var.set_humidity_setpoint_sensor(sens))
+    if CONF_HUMIDITY_SENSOR in config:
+        sens = await sensor.new_sensor(config[CONF_HUMIDITY_SENSOR])
+        cg.add(var.set_humidity_sensor(sens))
     # cg.add_library("dudanov/MideaUART", "1.1.8")

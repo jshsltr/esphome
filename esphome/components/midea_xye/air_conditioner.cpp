@@ -54,6 +54,7 @@ void AirConditioner::setup() {
   this->last_on_mode_ = *this->supported_modes_.begin();
   controlState = STATE_SEND_C0;
   ForceReadNextCycle = 1;
+  target_temperature = 18.0;
   followMeInit = false;
 
   // Start up in Auto fan mode (since unit doesn't report it correctly)

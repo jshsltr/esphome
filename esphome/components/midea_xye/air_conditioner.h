@@ -181,6 +181,7 @@ class AirConditioner : public PollingComponent, public climate::Climate, public 
 
   void dump_config() override;
   void set_outdoor_temperature_sensor(Sensor *sensor) { this->outdoor_sensor_ = sensor; }
+  //void set_target_temperature_sensor(Sensor *sensor) { this->target_temperature_sensor_ = sensor; }
   void set_temperature_1_sensor(Sensor *sensor) { this->temperature_1_sensor_ = sensor; }
   void set_temperature_2a_sensor(Sensor *sensor) { this->temperature_2a_sensor_ = sensor; }
   void set_temperature_2b_sensor(Sensor *sensor) { this->temperature_2b_sensor_ = sensor; }
@@ -190,7 +191,7 @@ class AirConditioner : public PollingComponent, public climate::Climate, public 
   void set_timer_stop_sensor(Sensor *sensor) { this->timer_stop_sensor_ = sensor; }
   void set_error_flags_sensor(Sensor *sensor) { this->error_flags_sensor_ = sensor; }
   void set_protect_flags_sensor(Sensor *sensor) { this->protect_flags_sensor_ = sensor; }
-  void set_humidity_setpoint_sensor(Sensor *sensor) { this->humidity_sensor_ = sensor; }
+  void set_humidity_sensor(Sensor *sensor) { this->humidity_sensor_ = sensor; }
   void set_power_sensor(Sensor *sensor) { this->power_sensor_ = sensor; }
   void set_use_fahrenheit(bool yesno) { this->use_fahrenheit_ = yesno; }
   void set_static_pressure_number(StaticPressureNumber *number) {
@@ -250,6 +251,7 @@ class AirConditioner : public PollingComponent, public climate::Climate, public 
   std::vector<const char *> supported_custom_fan_modes_{};
   bool use_fahrenheit_;
   Sensor *outdoor_sensor_{nullptr};
+  //Sensor *target_temperature_sensor_{nullptr};
   Sensor *temperature_1_sensor_{nullptr};
   Sensor *temperature_2a_sensor_{nullptr};
   Sensor *temperature_2b_sensor_{nullptr};
