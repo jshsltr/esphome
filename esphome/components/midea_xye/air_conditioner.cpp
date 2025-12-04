@@ -54,8 +54,12 @@ void AirConditioner::setup() {
   this->last_on_mode_ = *this->supported_modes_.begin();
   controlState = STATE_SEND_C0;
   ForceReadNextCycle = 1;
-  target_temperature = 18.0;
+  target_temperature = 18.0; // Default temperature on startup - when this is not set && wall control is not connected, initial set temp is returned NaN and HA midea climate thermostat visual temperature adjustments are not present.
+  #ifdef USE_FOLLOW_ME
+  followMeInit = true;
+  #else
   followMeInit = false;
+  #endif
 
   // Start up in Auto fan mode (since unit doesn't report it correctly)
   this->fan_mode = ClimateFanMode::CLIMATE_FAN_AUTO;
@@ -351,7 +355,11 @@ void AirConditioner::ParseResponse(uint8_t cmdSent) {
           // Don't update the fan mode. Assume it set correctly.
           // Show Heating vs Heat at least in Heat mode. Will figure
           // out how to determine if compressor is on in other modes later.
+          #ifdef USE_FOLLOW_ME
           update_property(this->current_temperature, nextFollowMeTemperature, need_publish);
+          #else
+          update_property(this->current_temperature, CalculateTemp(RXData[RX_C0_BYTE_T1_TEMP]), need_publish);
+          #endif
           if ((this->mode == climate::CLIMATE_MODE_HEAT) && (RXData[9] & 0x0F) != 0x00) {
             this->action = climate::CLIMATE_ACTION_HEATING;
             need_publish = true;

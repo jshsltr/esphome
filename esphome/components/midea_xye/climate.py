@@ -53,6 +53,7 @@ from esphome.components.climate import (
 # CODEOWNERS = ["@dudanov"]
 DEPENDENCIES = ["climate", "uart", "wifi"]
 AUTO_LOAD = ["number", "sensor"]
+CONF_FOLLOW_ME = "follow_me"
 CONF_TEMPERATURE_1 = "temperature_1"
 CONF_TEMPERATURE_2A = "temperature_2a"
 CONF_TEMPERATURE_2B = "temperature_2b"
@@ -145,6 +146,7 @@ CONFIG_SCHEMA = cv.All(
             ),
             cv.Optional(CONF_BEEPER, default=False): cv.boolean,
             cv.Optional(CONF_AUTOCONF, default=True): cv.boolean,
+            cv.Optional(CONF_FOLLOW_ME, default=False): cv.boolean,
             cv.Optional(CONF_SUPPORTED_MODES): cv.ensure_list(validate_modes),
             cv.Optional(CONF_SUPPORTED_SWING_MODES): cv.ensure_list(
                 validate_swing_modes
@@ -374,6 +376,8 @@ async def to_code(config):
         cg.add_define("USE_REMOTE_TRANSMITTER")
         transmitter_ = await cg.get_variable(config[CONF_TRANSMITTER_ID])
         cg.add(var.set_transmitter(transmitter_))
+    if CONF_FOLLOW_ME in config:
+        cg.add_define("USE_FOLLOW_ME")
     if CONF_SUPPORTED_MODES in config:
         cg.add(var.set_supported_modes(config[CONF_SUPPORTED_MODES]))
     if CONF_SUPPORTED_SWING_MODES in config:
