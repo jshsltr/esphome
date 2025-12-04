@@ -146,7 +146,7 @@ CONFIG_SCHEMA = cv.All(
             ),
             cv.Optional(CONF_BEEPER, default=False): cv.boolean,
             cv.Optional(CONF_AUTOCONF, default=True): cv.boolean,
-            cv.Optional(CONF_FOLLOW_ME, default=False): cv.use_id(cv.boolean),
+            cv.Required(CONF_FOLLOW_ME, default=False): cv.boolean,
             cv.Optional(CONF_SUPPORTED_MODES): cv.ensure_list(validate_modes),
             cv.Optional(CONF_SUPPORTED_SWING_MODES): cv.ensure_list(
                 validate_swing_modes
