@@ -377,7 +377,9 @@ async def to_code(config):
         transmitter_ = await cg.get_variable(config[CONF_TRANSMITTER_ID])
         cg.add(var.set_transmitter(transmitter_))
     if CONF_FOLLOW_ME in config:
-        cg.add_define("USE_FOLLOW_ME")
+        follow_state =  (config[CONF_FOLLOW_ME]).value
+        if follow_state:
+            cg.add_define("USE_FOLLOW_ME")
     if CONF_SUPPORTED_MODES in config:
         cg.add(var.set_supported_modes(config[CONF_SUPPORTED_MODES]))
     if CONF_SUPPORTED_SWING_MODES in config:
