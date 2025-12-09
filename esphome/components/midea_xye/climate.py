@@ -377,7 +377,7 @@ async def to_code(config):
         transmitter_ = await cg.get_variable(config[CONF_TRANSMITTER_ID])
         cg.add(var.set_transmitter(transmitter_))
     if CONF_FOLLOW_ME in config:
-        follow_state =  (config[CONF_FOLLOW_ME]).value
+        follow_state =  (config[CONF_FOLLOW_ME])
         if follow_state:
             cg.add_define("USE_FOLLOW_ME")
     if CONF_SUPPORTED_MODES in config:
