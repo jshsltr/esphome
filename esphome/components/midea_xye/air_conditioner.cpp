@@ -583,9 +583,7 @@ void AirConditioner::do_follow_me(float temperature, bool beeper, bool follow_me
     TXData[10] = 6;
     followMeInit = true;
   }
-  if (follow_me_setting != follow_me_state) {
-  this->follow_me_setting = follow_me_state;  
-  }
+  follow_me_setting = follow_me_state;  
   nextFollowMeTemperature = temperature;
   lastFollowMeTemperature = static_cast<uint8_t>(lroundf(temperature));
   TXData[11] = lastFollowMeTemperature;
