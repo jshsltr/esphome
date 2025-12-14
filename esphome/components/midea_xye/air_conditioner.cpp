@@ -55,12 +55,11 @@ void AirConditioner::setup() {
   controlState = STATE_SEND_C0;
   ForceReadNextCycle = 1;
   target_temperature = 18.0; // Default temperature on startup - when this is not set && wall control is not connected, initial set temp is returned NaN and HA midea climate thermostat visual temperature adjustments are not present.
-  #ifdef USE_FOLLOW_ME
+  if (follow_me_setting){
   followMeInit = true;
-  #else
+  else
   followMeInit = false;
-  #endif
-
+}
   // Start up in Auto fan mode (since unit doesn't report it correctly)
   this->fan_mode = ClimateFanMode::CLIMATE_FAN_AUTO;
 }

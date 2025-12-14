@@ -211,7 +211,7 @@ class AirConditioner : public PollingComponent, public climate::Climate, public 
   /* ### ACTIONS ### */
   /* ############### */
 
-  void do_follow_me(float temperature, bool beeper = false, bool follow_me_state);
+  void do_follow_me(float temperature, bool beeper = false, bool follow_me_state = false);
   void do_display_toggle();
   void do_swing_step();
   // TODO: Do we actually need these three?
