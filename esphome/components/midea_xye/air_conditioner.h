@@ -235,6 +235,7 @@ class AirConditioner : public PollingComponent, public climate::Climate, public 
   uint32_t response_timeout;
   bool followMeInit;
   uint8_t lastFollowMeTemperature;
+  bool follow_me_setting;
   float nextFollowMeTemperature;
 
  protected:
