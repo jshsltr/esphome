@@ -20,9 +20,10 @@ template<typename... Ts> class MideaActionBase : public Action<Ts...> {
 template<typename... Ts> class FollowMeAction : public MideaActionBase<Ts...> {
   TEMPLATABLE_VALUE(float, temperature)
   TEMPLATABLE_VALUE(bool, beeper)
+  TEMPLATABLE_VALUE(bool, follow_me_state)
 
   void play(const Ts &...x) override {
-    this->parent_->do_follow_me(this->temperature_.value(x...), this->beeper_.value(x...));
+    this->parent_->do_follow_me(this->temperature_.value(x...), this->beeper_.value(x...), this->follow_me_state_.value(x...));
   }
 };
 

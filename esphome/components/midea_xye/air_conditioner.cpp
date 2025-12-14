@@ -355,11 +355,12 @@ void AirConditioner::ParseResponse(uint8_t cmdSent) {
           // Don't update the fan mode. Assume it set correctly.
           // Show Heating vs Heat at least in Heat mode. Will figure
           // out how to determine if compressor is on in other modes later.
-          #ifdef USE_FOLLOW_ME
+          if (follow_me_setting) {
+            // Follow Me is active - use the last known Follow Me temperature
           update_property(this->current_temperature, nextFollowMeTemperature, need_publish);
-          #else
+          } else {
           update_property(this->current_temperature, CalculateTemp(RXData[RX_C0_BYTE_T1_TEMP]), need_publish);
-          #endif
+          } 
           if ((this->mode == climate::CLIMATE_MODE_HEAT) && (RXData[9] & 0x0F) != 0x00) {
             this->action = climate::CLIMATE_ACTION_HEATING;
             need_publish = true;
@@ -570,7 +571,7 @@ void AirConditioner::dump_config() {
 
 /* ACTIONS */
 
-void AirConditioner::do_follow_me(float temperature, bool beeper) {
+void AirConditioner::do_follow_me(float temperature, bool beeper, bool follow_me_state) {
 #ifdef USE_REMOTE_TRANSMITTER
   IrFollowMeData data(static_cast<uint8_t>(lroundf(temperature)), beeper);
   this->transmitter_.transmit(data);
@@ -581,6 +582,9 @@ void AirConditioner::do_follow_me(float temperature, bool beeper) {
   } else {
     TXData[10] = 6;
     followMeInit = true;
+  }
+  if (follow_me_setting != follow_me_state) {
+  this->follow_me_setting = follow_me_state;  
   }
   nextFollowMeTemperature = temperature;
   lastFollowMeTemperature = static_cast<uint8_t>(lroundf(temperature));
