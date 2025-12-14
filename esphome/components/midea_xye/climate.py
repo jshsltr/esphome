@@ -53,7 +53,7 @@ from esphome.components.climate import (
 # CODEOWNERS = ["@dudanov"]
 DEPENDENCIES = ["climate", "uart", "wifi"]
 AUTO_LOAD = ["number", "sensor"]
-CONF_FOLLOW_ME = "follow_me"
+CONF_FOLLOW_ME_STATE = "follow_me_state"
 CONF_TEMPERATURE_1 = "temperature_1"
 CONF_TEMPERATURE_2A = "temperature_2a"
 CONF_TEMPERATURE_2B = "temperature_2b"
@@ -146,7 +146,6 @@ CONFIG_SCHEMA = cv.All(
             ),
             cv.Optional(CONF_BEEPER, default=False): cv.boolean,
             cv.Optional(CONF_AUTOCONF, default=True): cv.boolean,
-            cv.Optional(CONF_FOLLOW_ME, default=False): cv.templatable(cv.boolean),
             cv.Optional(CONF_SUPPORTED_MODES): cv.ensure_list(validate_modes),
             cv.Optional(CONF_SUPPORTED_SWING_MODES): cv.ensure_list(
                 validate_swing_modes
@@ -283,6 +282,7 @@ MIDEA_FOLLOW_ME_SCHEMA = cv.Schema(
     {
         cv.Required(CONF_TEMPERATURE): cv.templatable(cv.temperature),
         cv.Optional(CONF_BEEPER, default=False): cv.templatable(cv.boolean),
+        cv.Optional(CONF_FOLLOW_ME_STATE): cv.templatable(cv.boolean),
     }
 )
 
