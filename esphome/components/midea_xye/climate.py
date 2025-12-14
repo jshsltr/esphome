@@ -293,6 +293,8 @@ async def follow_me_to_code(var, config, args):
     cg.add(var.set_beeper(template_))
     template_ = await cg.templatable(config[CONF_TEMPERATURE], args, cg.float_)
     cg.add(var.set_temperature(template_))
+    template_ = await cg.templatable(config[CONF_FOLLOW_ME_STATE], args, cg.bool_)
+    cg.add(var.set_follow_me_state(template_))
 
 
 # Toggle Display action
@@ -376,10 +378,6 @@ async def to_code(config):
         cg.add_define("USE_REMOTE_TRANSMITTER")
         transmitter_ = await cg.get_variable(config[CONF_TRANSMITTER_ID])
         cg.add(var.set_transmitter(transmitter_))
-    if CONF_FOLLOW_ME in config:
-        follow_state =  (config[CONF_FOLLOW_ME])
-        if follow_state:
-            cg.add_define("USE_FOLLOW_ME")
     if CONF_SUPPORTED_MODES in config:
         cg.add(var.set_supported_modes(config[CONF_SUPPORTED_MODES]))
     if CONF_SUPPORTED_SWING_MODES in config:
