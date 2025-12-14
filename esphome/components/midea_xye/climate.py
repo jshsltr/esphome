@@ -293,8 +293,6 @@ async def follow_me_to_code(var, config, args):
     cg.add(var.set_beeper(template_))
     template_ = await cg.templatable(config[CONF_TEMPERATURE], args, cg.float_)
     cg.add(var.set_temperature(template_))
-    template_ = await cg.templatable(config[CONF_FOLLOW_ME_STATE], args, cg.bool_)
-    cg.add(var.set_follow_me_state(template_))
 
 
 # Toggle Display action
