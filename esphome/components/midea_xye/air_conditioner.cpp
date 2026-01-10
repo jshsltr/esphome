@@ -57,7 +57,7 @@ void AirConditioner::setup() {
   target_temperature = 18.0; // Default temperature on startup - when this is not set && wall control is not connected, initial set temp is returned NaN and HA midea climate thermostat visual temperature adjustments are not present.
   if (follow_me_setting){
   followMeInit = true;
-  else
+  }  else {
   followMeInit = false;
   }
 }
