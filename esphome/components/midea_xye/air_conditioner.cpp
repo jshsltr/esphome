@@ -59,6 +59,7 @@ void AirConditioner::setup() {
   followMeInit = true;
   else
   followMeInit = false;
+  }
 }
   // Start up in Auto fan mode (since unit doesn't report it correctly)
   this->fan_mode = ClimateFanMode::CLIMATE_FAN_AUTO;
