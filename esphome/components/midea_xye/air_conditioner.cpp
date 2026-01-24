@@ -286,6 +286,7 @@ void AirConditioner::ParseResponse(uint8_t cmdSent) {
         switch (RXData[RX_C0_BYTE_OP_MODE] & 0xEF) {
           case OP_MODE_OFF:
             mode = ClimateMode::CLIMATE_MODE_OFF;
+            this->action = climate::CLIMATE_ACTION_OFF;
             break;
           case OP_MODE_AUTO:
             mode = ClimateMode::CLIMATE_MODE_HEAT_COOL;
