@@ -133,6 +133,8 @@ class TuyaClimate : public climate::Climate, public Component {
   TuyaDatapointType eco_type_{};
   uint8_t active_state_;
   uint8_t fan_state_;
+  uint8_t pellet_eco_state_;
+  uint8_t pellet_rate_state_;
   optional<uint8_t> swing_vertical_id_{};
   optional<uint8_t> swing_horizontal_id_{};
   optional<uint8_t> fan_speed_id_{};
