@@ -111,6 +111,24 @@ void TuyaClimate::setup() {
       this->publish_state();
     });
   }
+
+  if (this->pellet_eco_id_.has_value()) {
+    this->parent_->register_listener(*this->pellet_eco_id_, [this](const TuyaDatapoint &datapoint) {
+      ESP_LOGV(TAG, "MCU reported Pellet Eco Mode is: %u", datapoint.value_enum);
+      this->pellet_eco_state_ = datapoint.value_enum;
+      this->compute_pellet_eco_mode_();
+      this->publish_state();
+    });
+  }
+
+  if (this->pellet_rate_id_.has_value()) {
+    this->parent_->register_listener(*this->pellet_rate_id_, [this](const TuyaDatapoint &datapoint) {
+      ESP_LOGV(TAG, "MCU reported Pellet Rate Mode is: %u", datapoint.value_enum);
+      this->pellet_rate_state_ = datapoint.value_enum;
+      this->compute_pellet_rate_mode_();
+      this->publish_state();
+    });
+  }
 }
 
 void TuyaClimate::loop() {
@@ -162,6 +180,8 @@ void TuyaClimate::control(const climate::ClimateCall &call) {
 
   control_swing_mode_(call);
   control_fan_mode_(call);
+  control_pellet_eco_mode_(call);
+  control_pellet_rate_mode_(call);
 
   if (call.get_target_temperature().has_value()) {
     float target_temperature = *call.get_target_temperature();
@@ -287,6 +307,58 @@ void TuyaClimate::control_fan_mode_(const climate::ClimateCall &call) {
   }
 }
 
+void TuyaClimate::control_pellet_eco_mode_(const climate::ClimateCall &call) {
+  if (call.get_pellet_eco_mode().has_value()) {
+    climate::ClimatePelletEcoMode pellet_eco_mode = *call.get_pellet_eco_mode();
+
+    uint8_t tuya_pellet_eco_mode;
+    switch (pellet_eco_mode) {
+      case climate::CLIMATE_PELLET_ECO_OFF:
+        tuya_pellet_eco_mode = *pellet_eco_off_value_;
+        break;
+      case climate::CLIMATE_PELLET_ECO_ON:
+        tuya_pellet_eco_mode = *pellet_eco_on_value_;
+        break;
+      default:
+        tuya_pellet_eco_mode = 0;
+        break;
+    }
+
+    if (this->pellet_eco_id_.has_value()) {
+      this->parent_->set_enum_datapoint_value(*this->pellet_eco_id_, tuya_pellet_eco_mode);
+    }
+  }
+}
+
+void TuyaClimate::control_pellet_rate_mode_(const climate::ClimateCall &call) {
+  if (call.get_pellet_rate_mode().has_value()) {
+    climate::ClimatePelletRateMode pellet_rate_mode = *call.get_pellet_rate_mode();
+
+    uint8_t tuya_pellet_rate_mode;
+    switch (pellet_rate_mode) {
+      case climate::CLIMATE_PELLET_RATE_LOW:
+        tuya_pellet_rate_mode = *pellet_rate_low_value_;
+        break;
+      case climate::CLIMATE_PELLET_RATE_MEDIUM:
+        tuya_pellet_rate_mode = *pellet_rate_medium_value_;
+        break;
+      case climate::CLIMATE_PELLET_RATE_MIDDLE:
+        tuya_pellet_rate_mode = *pellet_rate_middle_value_;
+        break;
+      case climate::CLIMATE_PELLET_RATE_HIGH:
+        tuya_pellet_rate_mode = *pellet_rate_high_value_;
+        break;
+      default:
+        tuya_pellet_rate_mode = 0;
+        break;
+    }
+
+    if (this->pellet_rate_id_.has_value()) {
+      this->parent_->set_enum_datapoint_value(*this->pellet_rate_id_, tuya_pellet_rate_mode);
+    }
+  }
+}
+
 climate::ClimateTraits TuyaClimate::traits() {
   auto traits = climate::ClimateTraits();
   traits.add_feature_flags(climate::CLIMATE_SUPPORTS_ACTION);
@@ -295,7 +367,7 @@ climate::ClimateTraits TuyaClimate::traits() {
   }
 
   if (supports_heat_)
-    traits.add_supported_mode(climate::CLIMATE_MODE_HEAT);
+    c(climate::CLIMATE_MODE_HEAT);
   if (supports_cool_)
     traits.add_supported_mode(climate::CLIMATE_MODE_COOL);
   if (this->active_state_drying_value_.has_value())
@@ -331,6 +403,24 @@ climate::ClimateTraits TuyaClimate::traits() {
       traits.add_supported_fan_mode(climate::CLIMATE_FAN_HIGH);
     if (fan_speed_auto_value_)
       traits.add_supported_fan_mode(climate::CLIMATE_FAN_AUTO);
+  }
+
+  if (pellet_eco_id_) {
+    if (pellet_eco_off_value_)
+      traits.add_supported_pellet_eco_mode(climate::CLIMATE_PELLET_ECO_OFF);
+    if (pellet_eco_on_value_)
+      traits.add_supported_pellet_eco_mode(climate::CLIMATE_PELLET_ECO_ON);
+  }
+
+  if (pellet_rate_id_) {
+    if (pellet_rate_low_value_)
+      traits.add_supported_pellet_rate_mode(climate::CLIMATE_PELLET_RATE_LOW);
+    if (pellet_rate_medium_value_)
+      traits.add_supported_pellet_rate_mode(climate::CLIMATE_PELLET_RATE_MEDIUM);
+    if (pellet_rate_middle_value_)
+      traits.add_supported_pellet_rate_mode(climate::CLIMATE_PELLET_RATE_MIDDLE);
+    if (pellet_rate_high_value_)
+      traits.add_supported_pellet_rate_mode(climate::CLIMATE_PELLET_RATE_HIGH);
   }
   return traits;
 }
@@ -400,6 +490,32 @@ void TuyaClimate::compute_fanmode_() {
       this->fan_mode = climate::CLIMATE_FAN_MIDDLE;
     } else if (this->fan_speed_low_value_.has_value() && this->fan_state_ == this->fan_speed_low_value_) {
       this->fan_mode = climate::CLIMATE_FAN_LOW;
+    }
+  }
+}
+
+void TuyaClimate::compute_pellet_eco_mode_() {
+  if (this->pellet_eco_id_.has_value()) {
+    // Use state from MCU datapoint
+    if (this->pellet_eco_on_value_.has_value() && this->pellet_eco_state_ == this->pellet_eco_on_value_) {
+      this->pellet_eco_mode = climate::CLIMATE_PELLET_ECO_ON;
+    } else if (this->pellet_eco_off_value_.has_value() && this->pellet_eco_state_ == this->pellet_eco_off_value_) {
+      this->pellet_eco_mode = climate::CLIMATE_PELLET_ECO_OFF;
+    }
+  }
+}
+
+void TuyaClimate::compute_pellet_rate_mode_() {
+  if (this->pellet_rate_id_.has_value()) {
+    // Use state from MCU datapoint
+    if (this->pellet_rate_low_value_.has_value() && this->pellet_rate_state_ == this->pellet_rate_low_value_) {
+      this->pellet_rate_mode = climate::CLIMATE_PELLET_RATE_LOW;
+    } else if (this->pellet_rate_medium_value_.has_value() && this->pellet_rate_state_ == this->pellet_rate_medium_value_) {
+      this->pellet_rate_mode = climate::CLIMATE_PELLET_RATE_MEDIUM;
+    } else if (this->pellet_rate_middle_value_.has_value() && this->pellet_rate_state_ == this->pellet_rate_middle_value_) {
+      this->pellet_rate_mode = climate::CLIMATE_PELLET_RATE_MIDDLE;
+    } else if (this->pellet_rate_high_value_.has_value() && this->pellet_rate_state_ == this->pellet_rate_high_value_) {
+      this->pellet_rate_mode = climate::CLIMATE_PELLET_RATE_HIGH;
     }
   }
 }

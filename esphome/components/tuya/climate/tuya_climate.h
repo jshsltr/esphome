@@ -13,6 +13,7 @@ class TuyaClimate : public climate::Climate, public Component {
   void loop() override;
   void dump_config() override;
   void set_supports_heat(bool supports_heat) { this->supports_heat_ = supports_heat; }
+  void set_supports_pellet(bool supports_pellet) { this->supports_pellet_ = supports_pellet; }
   void set_supports_cool(bool supports_cool) { this->supports_cool_ = supports_cool; }
   void set_switch_id(uint8_t switch_id) { this->switch_id_ = switch_id; }
   void set_active_state_id(uint8_t state_id) { this->active_state_id_ = state_id; }
@@ -52,6 +53,16 @@ class TuyaClimate : public climate::Climate, public Component {
 
   void set_reports_fahrenheit() { this->reports_fahrenheit_ = true; }
 
+  void set_pellet_eco_id(uint8_t pellet_eco_id) { this->pellet_eco_id_ = pellet_eco_id; }
+  void set_pellet_eco_off_value(uint8_t pellet_eco_off_value) { this->pellet_eco_off_value_ = pellet_eco_off_value; }
+  void set_pellet_eco_on_value(uint8_t pellet_eco_on_value) { this->pellet_eco_on_value_ = pellet_eco_on_value; }
+
+  void set_pellet_rate_id(uint8_t pellet_rate_id) { this->pellet_rate_id_ = pellet_rate_id; }
+  void set_pellet_rate_low_value(uint8_t pellet_rate_low_value) { this->pellet_rate_low_value_ = pellet_rate_low_value; }
+  void set_pellet_rate_medium_value(uint8_t pellet_rate_medium_value) { this->pellet_rate_medium_value_ = pellet_rate_medium_value; }
+  void set_pellet_rate_middle_value(uint8_t pellet_rate_middle_value) { this->pellet_rate_middle_value_ = pellet_rate_middle_value; }
+  void set_pellet_rate_high_value(uint8_t pellet_rate_high_value) { this->pellet_rate_high_value_ = pellet_rate_high_value; }
+
   void set_tuya_parent(Tuya *parent) { this->parent_ = parent; }
 
  protected:
@@ -63,6 +74,12 @@ class TuyaClimate : public climate::Climate, public Component {
 
   /// Override control to change settings of fan mode.
   void control_fan_mode_(const climate::ClimateCall &call);
+
+  /// Override control to change settings of the pellet eco mode.
+  void control_pellet_eco_mode_(const climate::ClimateCall &call);
+
+  /// Override control to change settings of the pellet rate mode.
+  void control_pellet_rate_mode_(const climate::ClimateCall &call);
 
   /// Return the traits of this controller.
   climate::ClimateTraits traits() override;
@@ -82,12 +99,21 @@ class TuyaClimate : public climate::Climate, public Component {
   /// Re-Compute the fan mode of this climate controller.
   void compute_fanmode_();
 
+  /// Re-Compute the pellet eco mode of this climate controller.
+  void compute_pellet_eco_mode_();
+
+  /// Re-Compute the pellet rate mode of this climate controller.
+  void compute_pellet_rate_mode_();
+
   /// Switch the climate device to the given climate mode.
   void switch_to_action_(climate::ClimateAction action);
 
   Tuya *parent_;
   bool supports_heat_;
   bool supports_cool_;
+  bool supports_pellet_;
+  optional<uint8_t> pellet_eco_id_{};
+  optional<uint8_t> pellet_rate_id_{};
   optional<uint8_t> switch_id_{};
   optional<uint8_t> active_state_id_{};
   optional<uint8_t> active_state_heating_value_{};
@@ -115,6 +141,12 @@ class TuyaClimate : public climate::Climate, public Component {
   optional<uint8_t> fan_speed_middle_value_{};
   optional<uint8_t> fan_speed_high_value_{};
   optional<uint8_t> fan_speed_auto_value_{};
+  optional<uint8_t> pellet_eco_off_value_{};
+  optional<uint8_t> pellet_eco_on_value_{};
+  optional<uint8_t> pellet_rate_low_value_{};
+  optional<uint8_t> pellet_rate_medium_value_{};
+  optional<uint8_t> pellet_rate_middle_value_{};
+  optional<uint8_t> pellet_rate_high_value_{};
   bool swing_vertical_{false};
   bool swing_horizontal_{false};
   bool heating_state_{false};
